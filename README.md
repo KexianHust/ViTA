@@ -1,3 +1,5 @@
 # ViTA: Video Transformer Adaptor for Robust Video Depth Estimation
 
-[Supplementary material](https://www.youtube.com/watch?v=chAAD6fX628)
+![image](https://github.com/KexianHust/ViTA/st-slice-sota.png)
+
+[Video](https://youtu.be/3NgVnLWGQTU)
