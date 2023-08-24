@@ -14,7 +14,7 @@ If you find our work useful in your research, please consider citing the paper.
 @article{Xian_2023_TMM,
 author = {Xian, Ke and Peng, Juewen and Cao, Zhiguo and Zhang, Jianming and Lin Guosheng},
 title = {ViTA: Video Transformer Adaptor for Robust Video Depth Estimation},
-journal = {The IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+journal = {IEEE Transactions on Multimedia},
 year = {2023}
 }
 ```
