@@ -65,6 +65,9 @@
 3) The results are written to the folder `output_monodepth`.
 
 
+## :thumbsup: Acknowledgement
+Our code was developed based on [DPT](https://github.com/isl-org/DPT). Thanks for this inspiring work!
+
 ## :blush: Citation
 If you find our work useful in your research, please consider citing the paper.
 ```
