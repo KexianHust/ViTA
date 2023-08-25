@@ -1,16 +1,36 @@
-# ViTA: Video Transformer Adaptor for Robust Video Depth Estimation
-This repository contains a pytorch implementation of our T-MM paper:
-> ViTA: Video Transformer Adaptor for Robust Video Depth Estimation
-> 
-> Ke Xian, Juewen Peng, Zhiguo Cao, Jianming Zhang, Guosheng Lin
+<div align="center">
 
-[Project Page](https://kexianhust.github.io/ViTA/)
-![image](https://github.com/KexianHust/ViTA/blob/main/st-slice-sota.png)
+  <h1>ViTA: Video Transformer Adaptor for Robust Video Depth Estimation</h1>
+  
+  <div>
+      <a href="https://sites.google.com/site/kexian1991/" target="_blank">Ke Xian<sup>1</sup></a>,
+      <a href="https://juewenpeng.github.io/" target="_blank">Juewen Peng<sup>2</sup></a>,
+      <a href="http://english.aia.hust.edu.cn/info/1085/1528.htm" target="_blank">Zhiguo Cao<sup>2</sup></a>,
+      <a href="https://jimmie33.github.io/" target="_blank">Jianming Zhang<sup>3</sup></a>,
+      <a href="https://guosheng.github.io/" target="_blank">Guosheng Lin<sup>1*</sup></a>
+  </div>
+  <div>
+      <br/><sup>1</sup>S-Lab, Nanyang Technological Univerisity<br/><sup>2</sup>Huazhong University of Science and Technology<br/><sup>3</sup>Adobe Research<br/>
+  </div>
+  <div>
+  IEEE T-MM.
+</div>
 
-[Video](https://youtu.be/3NgVnLWGQTU)
+### [Project Page](https://kexianhust.github.io/ViTA/) | [Arxiv]() | [Video]([https://youtu.be/SNV9F-60xrE](https://youtu.be/3NgVnLWGQTU))
 
-## Changelog
-* [Aug. 2023] Initial release of inference code and models
+<!-- | ![visitors](https://visitor-badge.laobi.icu/badge?page_id=Yuxinn-J/Scenimefy) -->
+
+  </br>
+  
+  <div style="width: 100%; text-align: center; margin:auto;">
+      <img style="width:100%" src="st-slice-sota.png">
+  </div>
+
+</div>
+
+## Updates
+* [08/2023] Initial release of inference code and models.
+* [08/2023] The paper is accepted by T-MM.
 
 ## Setup 
 
