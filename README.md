@@ -16,7 +16,7 @@
   IEEE T-MM.
 </div>
 
-### [Project Page](https://kexianhust.github.io/ViTA/) | [Arxiv]() | [Video]([https://youtu.be/SNV9F-60xrE](https://youtu.be/3NgVnLWGQTU))
+### [Project Page](https://kexianhust.github.io/ViTA/) | [Arxiv]() | [Video](https://youtu.be/3NgVnLWGQTU)
 
 <!-- | ![visitors](https://visitor-badge.laobi.icu/badge?page_id=Yuxinn-J/Scenimefy) -->
 
