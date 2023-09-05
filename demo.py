@@ -190,7 +190,7 @@ def run(input_path, output_path, model_path, checkpoint,  optimize=True):
 if __name__ == "__main__":
 
     import os
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
     parser = argparse.ArgumentParser()
 
