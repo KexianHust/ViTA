@@ -62,9 +62,9 @@
 
     ```shell
     # For vita-hybrid
-    python demo.py ----model_type dpt_hybrid --attn_interval=3
+    python demo.py --model_type dpt_hybrid --attn_interval=3
     # For vita-large
-    python demo.py ----model_type dpt_large --attn_interval=2
+    python demo.py --model_type dpt_large --attn_interval=2
     ```
 
 3) The results are written to the folder `output_monodepth`.
