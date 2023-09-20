@@ -34,6 +34,7 @@
 </div>
 
 ## :eyes: Updates
+* [TODO]: Stronger models based on MiDaS 3.1.
 * [08/2023] Initial release of inference code and models.
 * [08/2023] The paper is accepted by T-MM.
 
