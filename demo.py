@@ -1,5 +1,13 @@
-"""Compute depth maps for images in the input folder.
-"""
+#
+# Copyright (C) 2023, X-Lab
+# All rights reserved.
+#
+# This software is free for non-commercial, research and evaluation use
+# under the terms of the LICENSE.md file.
+#
+# For inquiries contact  ke.xian@ntu.edu.sg or xianke1991@gmail.com
+#
+
 import os
 import glob
 import torch
@@ -13,18 +21,11 @@ from torch.nn import DataParallel as DP
 from torchvision.transforms import Compose
 
 from dpt.models import DPTDepthModel
-from dpt.midas_net import MidasNet_large
 from dpt.transforms import Resize, NormalizeImage, PrepareForNet
 
 
-def run(input_path, output_path, model_path, checkpoint,  optimize=True):
-    """Run MonoDepthNN to compute depth maps.
+def run(input_path, output_path, model, checkpoint,  optimize=True):
 
-    Args:
-        input_path (str): path to input folder
-        output_path (str): path to output folder
-        model_path (str): path to saved model
-    """
     print("initialize")
 
     # select device
@@ -36,17 +37,9 @@ def run(input_path, output_path, model_path, checkpoint,  optimize=True):
 
     # load network
     net_w = net_h = 384
-    model = DPTDepthModel(
-        path=model_path,
-        backbone="vitb_rn50_384",
-        non_negative=True,
-        enable_attention_hooks=False,
-        attn_interval=3,
-    )
-
     model = DP(model)
     checkpoint = torch.load(checkpoint)
-    model.load_state_dict(checkpoint['model'])
+    model.load_state_dict(checkpoint)
 
     normalization = NormalizeImage(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 
@@ -96,7 +89,6 @@ def run(input_path, output_path, model_path, checkpoint,  optimize=True):
         vidcap = cv2.VideoCapture(video_name)
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 
-        # img_inputs = []
         img_inputs = None
         predictions = None
 
@@ -138,7 +130,6 @@ def run(input_path, output_path, model_path, checkpoint,  optimize=True):
 
             # compute
             with torch.no_grad():
-                # sample = np.stack(img_inputs, axis=0)
                 sample = torch.from_numpy(sample).to(device)
 
                 if optimize == True and device == torch.device("cuda"):
@@ -190,7 +181,7 @@ def run(input_path, output_path, model_path, checkpoint,  optimize=True):
 if __name__ == "__main__":
 
     import os
-    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
     parser = argparse.ArgumentParser()
 
@@ -216,30 +207,46 @@ if __name__ == "__main__":
         help="model type [dpt_large|dpt_hybrid|midas_v21]",
     )
 
-    parser.add_argument("--checkpoint",
-                        default='checkpoints/vita-hybrid-intval=3.pth',
-                        help='checkpoint')
-
-    parser.add_argument("--kitti_crop", dest="kitti_crop", action="store_true")
+    parser.add_argument(
+        "--attn_interval",
+        default=2,
+        type=int,
+        help="1,2,3,4,6",
+    )
 
     parser.add_argument("--optimize", dest="optimize", action="store_true")
     parser.add_argument("--no-optimize", dest="optimize", action="store_false")
 
     parser.set_defaults(optimize=True)
-    parser.set_defaults(kitti_crop=False)
 
     args = parser.parse_args()
 
     default_models = {
-        "midas_v21": "weights/midas_v21-f6b98070.pt",
         "dpt_large": "weights/dpt_large-midas-2f21e586.pt",
         "dpt_hybrid": "weights/dpt_hybrid-midas-501f0c75.pt",
-        "dpt_hybrid_kitti": "weights/dpt_hybrid_kitti-cb926ef4.pt",
-        "dpt_hybrid_nyu": "weights/dpt_hybrid_nyu-2ce69ec7.pt",
     }
 
     if args.model_weights is None:
         args.model_weights = default_models[args.model_type]
+
+    if args.model_type == 'dpt_large':
+        model = DPTDepthModel(
+            # path=args.model_weights,
+            backbone="vitl16_384",
+            non_negative=True,
+            enable_attention_hooks=False,
+            attn_interval=args.attn_interval,
+        )
+        checkpoint = 'checkpoints/vita-large.pth'
+    elif args.model_type == 'dpt_hybrid':
+        model = DPTDepthModel(
+            # path=args.model_weights,
+            backbone="vitb_rn50_384",
+            non_negative=True,
+            enable_attention_hooks=False,
+            attn_interval=args.attn_interval,
+        )
+        checkpoint = 'checkpoints/vita-hybrid.pth'
 
     # set torch options
     torch.backends.cudnn.enabled = True
@@ -249,7 +256,8 @@ if __name__ == "__main__":
     run(
         args.input_path,
         args.output_path,
-        args.model_weights,
-        args.checkpoint,
+        model,
+        checkpoint,
         args.optimize,
     )
+

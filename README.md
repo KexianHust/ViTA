@@ -10,7 +10,7 @@
       <a href="https://guosheng.github.io/" target="_blank">Guosheng Lin<sup>1*</sup></a>
   </div>
   <div>
-      <br/><sup>1</sup>S-Lab, Nanyang Technological Univerisity<br/><sup>2</sup>Huazhong University of Science and Technology<br/><sup>3</sup>Adobe Research<br/>
+      <br/><sup>1</sup>Nanyang Technological Univerisity<br/><sup>2</sup>Huazhong University of Science and Technology<br/><sup>3</sup>Adobe Research<br/>
   </div>
   <div>
   IEEE T-MM.
@@ -40,8 +40,9 @@
 ## :wrench: Setup 
 
 1) Download the weights and place them in the `weights` and `checkpoints` folder, respectively:
-- [dpt_hybrid-midas-501f0c75.pt](https://github.com/intel-isl/DPT/releases/download/1_0/dpt_hybrid-midas-501f0c75.pt), [Mirror](https://drive.google.com/file/d/1dgcJEYYw1F8qirXhZxgNK8dWWz_8gZBD/view?usp=sharing)
-- [vita-hybrid-intval=3.pth](https://drive.google.com/file/d/1z4vKbGaZRUDMMftRKmTGv48Ih_B3a_Y5/view?usp=share_link)
+
+- For vita-hybrid: [vita-hybrid.pth](https://drive.google.com/file/d/1u_Peqr5Z-AVxzddHj_EUZst3K9pcsJhf/view?usp=drive_link)
+- For vita-large: [vita-large.pth](https://drive.google.com/file/d/1y71agkYZTrTzgR6JpNfG2lri7qT32YUg/view?usp=drive_link)
 
   
 2) Set up dependencies: 
@@ -59,7 +60,10 @@
 2) Run our model:
 
     ```shell
-    python demo.py
+    # For vita-hybrid
+    python demo.py ----model_type dpt_hybrid --attn_interval=3
+    # For vita-large
+    python demo.py ----model_type dpt_large --attn_interval=2
     ```
 
 3) The results are written to the folder `output_monodepth`.
@@ -81,7 +85,7 @@ doi={10.1109/TMM.2023.3309559}
 ```
 
 ## :key: License
-Distributed under the S-Lab License. Please refer to [LICENSE](./LICENSE) for more details.
+Please refer to [LICENSE](./LICENSE) for more details.
 
 ## :email: Contact
 Please contact Ke Xian (ke.xian@ntu.edu.sg or xianke1991@gmail.com) if you have any questions.
