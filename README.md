@@ -40,7 +40,7 @@
 
 ## :wrench: Setup 
 
-1) Download the weights and place them in the `weights` and `checkpoints` folder, respectively:
+1) Download the checkpoints and place them in the `checkpoints` folder:
 
 - For vita-hybrid: [vita-hybrid.pth](https://drive.google.com/file/d/1u_Peqr5Z-AVxzddHj_EUZst3K9pcsJhf/view?usp=drive_link)
 - For vita-large: [vita-large.pth](https://drive.google.com/file/d/1y71agkYZTrTzgR6JpNfG2lri7qT32YUg/view?usp=drive_link)
