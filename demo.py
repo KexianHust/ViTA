@@ -24,7 +24,7 @@ from dpt.models import DPTDepthModel
 from dpt.transforms import Resize, NormalizeImage, PrepareForNet
 
 
-def run(input_path, output_path, model, checkpoint,  optimize=True):
+def run_video(input_path, output_path, model, checkpoint,  optimize=True):
 
     print("initialize")
 
@@ -178,6 +178,140 @@ def run(input_path, output_path, model, checkpoint,  optimize=True):
     print("finished")
 
 
+def run_imgs(input_path, output_path, model, checkpoint,  optimize=True):
+
+    print("initialize")
+
+    # select device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("device: %s" % device)
+
+    # save video with 12 fps
+    fps = 12
+
+    # load network
+    net_w = net_h = 384
+    model = DP(model)
+    checkpoint = torch.load(checkpoint)
+    model.load_state_dict(checkpoint)
+
+    normalization = NormalizeImage(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+
+    transform = Compose(
+        [
+            Resize(
+                net_w,
+                net_h,
+                resize_target=None,
+                keep_aspect_ratio=True,
+                ensure_multiple_of=32,
+                resize_method="minimal",
+                image_interpolation_method=cv2.INTER_CUBIC,
+            ),
+            normalization,
+            PrepareForNet(),
+        ]
+    )
+
+    model.eval()
+
+    if optimize == True and device == torch.device("cuda"):
+        model = model.to(memory_format=torch.channels_last)
+        model = model.half()
+
+    model.to(device)
+
+    # get input
+    img_names = sorted(os.listdir(input_path))
+    num_images = len(img_names)
+
+    # create output folder
+    os.makedirs(output_path, exist_ok=True)
+
+    print("start processing")
+    img_inputs = None
+    predictions = None
+    for ind, img_name in enumerate(img_names):
+        img_name = os.path.join(input_path, img_name)
+
+        print("  processing {} ({}/{})".format(img_name, ind + 1, num_images))
+        image = cv2.imread(img_name)
+        img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) / 255.0
+        img_input = transform({"image": img})["image"]
+
+        if img_inputs is None:
+            img_inputs = img_input[None]
+        else:
+            img_inputs = np.concatenate((img_inputs, img_input[None]), axis=0)
+
+    overlap = 1  # 0
+    interval = 1
+    seq_len = 4
+    shift = 0
+
+    img_num, c, h, w = img_inputs.shape
+    predictions = np.zeros((img_num, h, w)).astype(np.float32)
+    count = np.zeros((img_num, 1, 1)).astype(np.float32)
+
+    done = False
+    for i in range(0, img_num, seq_len - overlap * 2):
+        if i + interval * seq_len >= img_num:
+            done = True
+            sample = img_inputs[img_num - interval * seq_len:img_num:interval]
+        else:
+            sample = img_inputs[i:i + interval * seq_len:interval]
+
+        # compute
+        with torch.no_grad():
+            sample = torch.from_numpy(sample).to(device)
+
+            if optimize == True and device == torch.device("cuda"):
+                sample = sample.to(memory_format=torch.channels_last)
+                sample = sample.half()
+
+            sample = sample.unsqueeze(0)
+
+            prediction = model.forward(sample).squeeze(0)
+            prediction = (
+                prediction
+                    .squeeze()
+                    .cpu()
+                    .numpy()
+            )
+
+        if i == 0:
+            predictions[i:i + interval * (seq_len - overlap):interval] = predictions[i:i + interval * (seq_len - overlap):interval] + prediction[:seq_len - overlap]
+            count[i:i + interval * (seq_len - overlap):interval] = count[i:i + interval * (seq_len - overlap):interval] + 1
+        elif i == img_num - interval * (seq_len - 1) - 1:
+            predictions[i + interval * overlap:i + interval * seq_len:interval] = predictions[i + interval * overlap:i + interval * seq_len:interval] + prediction[overlap:]
+            count[i + interval * overlap:i + interval * seq_len:interval] = count[i + interval * overlap:i + interval * seq_len:interval] + 1
+        else:
+            predictions[i + interval * overlap:i + interval * (seq_len - overlap):interval] = predictions[i + interval * overlap:i + interval * (seq_len - overlap):interval] + prediction[overlap:seq_len - overlap]
+            count[i + interval * overlap:i + interval * (seq_len - overlap):interval] = count[i + interval * overlap:i + interval * (seq_len - overlap):interval] + 1
+
+        if done:
+            break
+
+    predictions = predictions / count
+
+    predictions = (predictions - predictions.min()) / (predictions.max() - predictions.min()) * 255
+    predictions = predictions.astype(np.uint8)
+
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    savename = os.path.join(output_path, os.path.split(input_path)[-1] + '.mp4')
+    videoWriter = cv2.VideoWriter(savename, fourcc, fps, (img.shape[1], img.shape[0]))
+    colormap = plt.get_cmap('inferno')
+    for i in range(predictions.shape[0]):
+        heatmap = (colormap(predictions[i]) * 2 ** 8).astype(np.uint8)[:, :, :3]
+        prediction = cv2.cvtColor(heatmap, cv2.COLOR_RGB2BGR)
+        prediction = cv2.resize(prediction, dsize=(img.shape[1], img.shape[0]), interpolation=cv2.INTER_LINEAR)
+        videoWriter.write(prediction)
+
+    videoWriter.release()
+    del videoWriter
+
+    print("finished")
+
 if __name__ == "__main__":
 
     import os
@@ -214,6 +348,12 @@ if __name__ == "__main__":
         help="1,2,3,4,6",
     )
 
+    parser.add_argument(
+        "--format",
+        default="video",
+        help="model type [video|imgs]",
+    )
+
     parser.add_argument("--optimize", dest="optimize", action="store_true")
     parser.add_argument("--no-optimize", dest="optimize", action="store_false")
 
@@ -231,7 +371,6 @@ if __name__ == "__main__":
 
     if args.model_type == 'dpt_large':
         model = DPTDepthModel(
-            # path=args.model_weights,
             backbone="vitl16_384",
             non_negative=True,
             enable_attention_hooks=False,
@@ -240,7 +379,6 @@ if __name__ == "__main__":
         checkpoint = 'checkpoints/vita-large.pth'
     elif args.model_type == 'dpt_hybrid':
         model = DPTDepthModel(
-            # path=args.model_weights,
             backbone="vitb_rn50_384",
             non_negative=True,
             enable_attention_hooks=False,
@@ -253,11 +391,23 @@ if __name__ == "__main__":
     torch.backends.cudnn.benchmark = True
 
     # compute depth maps
-    run(
-        args.input_path,
-        args.output_path,
-        model,
-        checkpoint,
-        args.optimize,
-    )
+    if args.format == 'video':
+        # run demo on videos
+        run_video(
+            args.input_path,
+            args.output_path,
+            model,
+            checkpoint,
+            args.optimize,
+        )
+    else:
+        # run demo on a image squence
+        run_imgs(
+            args.input_path,
+            args.output_path,
+            model,
+            checkpoint,
+            args.optimize,
+        )
+
 

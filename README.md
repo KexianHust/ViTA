@@ -56,15 +56,24 @@
 
 ## :zap: Inference 
 
-1) Place one or more input videos in the folder `input_video`.
+1) Place one or more input videos in the folder `input_video`, or place image sequences in the folder `input_imgs`.
 
 2) Run our model:
 
     ```shell
-    # For vita-hybrid
+    ## Input video
+    # Run vita-hybrid
     python demo.py --model_type dpt_hybrid --attn_interval=3
-    # For vita-large
+    # Run vita-large
     python demo.py --model_type dpt_large --attn_interval=2
+    ```
+   
+   ```shell
+    # Input image sequences
+    # Run vita-hybrid
+    python demo.py --model_type dpt_hybrid --attn_interval=3 --format imgs --input_path input_imgs/
+    # Run vita-large
+    python demo.py --model_type dpt_large --attn_interval=2 --format imgs --input_path input_imgs/
     ```
 
 3) The results are written to the folder `output_monodepth`.
