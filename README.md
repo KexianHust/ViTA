@@ -49,10 +49,10 @@
 2) Set up dependencies: 
 
     ```shell
-    pip install torch torchvision opencv-python timm
+    conda env create -f environment.yaml
+    conda activate vita
     ```
 
-   The code was tested with Python 3.9, PyTorch 1.11.0
 
 ## :zap: Inference 
 
@@ -69,11 +69,11 @@
     ```
    
    ```shell
-    # Input image sequences
+    # Input image sequences (xx/01.png, xx/02.png, ...)
     # Run vita-hybrid
-    python demo.py --model_type dpt_hybrid --attn_interval=3 --format imgs --input_path input_imgs/
+    python demo.py --model_type dpt_hybrid --attn_interval=3 --format imgs --input_path input_imgs/xx
     # Run vita-large
-    python demo.py --model_type dpt_large --attn_interval=2 --format imgs --input_path input_imgs/
+    python demo.py --model_type dpt_large --attn_interval=2 --format imgs --input_path input_imgs/xx
     ```
 
 3) The results are written to the folder `output_monodepth`.

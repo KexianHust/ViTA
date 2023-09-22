@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2023, X-Lab
+# Copyright (C) 2023, NTU
 # All rights reserved.
 #
 # This software is free for non-commercial, research and evaluation use
