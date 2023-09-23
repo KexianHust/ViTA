@@ -15,6 +15,7 @@
   <div>
   IEEE T-MM.
 </div>
+</div>
 
 ### [Project Page](https://kexianhust.github.io/ViTA/) | [Arxiv]() | [Video](https://youtu.be/3NgVnLWGQTU)
 
