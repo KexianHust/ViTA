@@ -38,7 +38,7 @@ def run_video(input_path, output_path, model, checkpoint,  optimize=True):
     # load network
     net_w = net_h = 384
     model = DP(model)
-    checkpoint = torch.load(checkpoint)
+    checkpoint = torch.load(checkpoint, map_location=torch.device(device))
     model.load_state_dict(checkpoint)
 
     normalization = NormalizeImage(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
